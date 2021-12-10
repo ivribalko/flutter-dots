@@ -1,16 +1,21 @@
 import 'dart:async';
 
+import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 
-import 'dot_component.dart';
+import 'component/dot.dart';
+import 'component/dot_highlight.dart';
 
-class App extends FlameGame with HasCollidables {
+class App extends FlameGame with HasCollidables, HasTappables {
   @override
   Future<void> onLoad() async {
-    unawaited(add(DotComponent(
+    unawaited(add(Dot(
       position: size / 2,
-      size: Vector2.all(20),
-    )));
+    )..anchor = Anchor.center));
+
+    unawaited(add(DotHighlight(
+      position: size / 2,
+    )..anchor = Anchor.center));
 
     return super.onLoad();
   }
