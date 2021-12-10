@@ -1,17 +1,17 @@
 import 'package:get/get.dart';
 
 class Model extends GetxController {
-  final count = 0.obs;
+  int get size => dots.length;
+  final List<List<Dot>> dots = [
+    [Dot(0), Dot(1), Dot(2), Dot(3)],
+    [Dot(0), Dot(1), Dot(2), Dot(3)],
+    [Dot(0), Dot(1), Dot(2), Dot(3)],
+    [Dot(0), Dot(1), Dot(2), Dot(3)],
+  ];
+}
 
-  @override
-  void onInit() {
-    super.onInit();
-    count.listen((v) => Get.log('$v'));
-  }
+class Dot {
+  final int color;
 
-  @override
-  void onClose() {
-    count.close();
-    super.onClose();
-  }
+  Dot(this.color);
 }

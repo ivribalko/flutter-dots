@@ -4,14 +4,18 @@ import 'package:flame/geometry.dart';
 import 'package:flame/input.dart';
 import 'package:flutter/material.dart';
 
-class DotHighlight extends PositionComponent
+class DotHighlightComponent extends PositionComponent
     with HasHitboxes, Collidable, Tappable {
+  final Color color;
+
   Color _color = Colors.transparent;
 
   /// Create a new Rocket component at the given [position].
-  DotHighlight({
+  DotHighlightComponent({
     required Vector2 position,
-  }) : super(
+    required Color color,
+  })  : color = color.withAlpha(100),
+        super(
           position: position,
           size: Vector2.all(30),
         );
@@ -24,7 +28,7 @@ class DotHighlight extends PositionComponent
 
   @override
   bool onTapDown(TapDownInfo info) {
-    _color = Colors.white24;
+    _color = color;
     return false;
   }
 
