@@ -29,7 +29,7 @@ class DotHighlightComponent extends PositionComponent
   @override
   bool onTapDown(TapDownInfo info) {
     _color = color;
-    return false;
+    return true;
   }
 
   @override
