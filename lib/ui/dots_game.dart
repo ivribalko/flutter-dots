@@ -37,12 +37,18 @@ class DotsGame extends FlameGame
       var dots = path.dots;
       var offset = info.eventPosition.global;
 
-      for (var dot in children.query<DotComponent>()) {
-        if (dot.containsPoint(offset)) {
-          if (dots.first.color == dot.color) {
-            if (dots.first == dot || !dots.contains(dot)) {
-              dots.add(dot);
-              points.insert(points.length - 1, dot.position.toOffset());
+      for (var component in children.query<DotComponent>()) {
+        if (component.containsPoint(offset)) {
+          if (dots.first.color == component.color) {
+            var last = dots.last.dot;
+            var item = component.dot;
+            if (last.x == item.x && (last.y - item.y).abs() == 1 ||
+                last.y == item.y && (last.x - item.x).abs() == 1) {
+              dots.add(component);
+              points.insert(
+                points.length - 1,
+                component.position.toOffset(),
+              );
             }
           }
         }
