@@ -31,12 +31,32 @@ class DotsGame extends FlameGame
 
   @override
   void onDragUpdate(int pointerId, DragUpdateInfo info) {
-    path.points.last = info.eventPosition.global.toOffset();
+    var points = path.points;
+
+    if (points.isNotEmpty) {
+      var dots = path.dots;
+      var offset = info.eventPosition.global;
+
+      for (var dot in children.query<DotComponent>()) {
+        if (dot.containsPoint(offset)) {
+          if (dots.first.color == dot.color) {
+            if (dots.first == dot || !dots.contains(dot)) {
+              dots.add(dot);
+              points.insert(points.length - 1, dot.position.toOffset());
+            }
+          }
+        }
+      }
+
+      points.last = offset.toOffset();
+    }
+
     super.onDragUpdate(pointerId, info);
   }
 
   @override
   void onDragEnd(int pointerId, DragEndInfo info) {
+    path.dots.clear();
     path.points.clear();
     super.onDragEnd(pointerId, info);
   }
@@ -61,11 +81,13 @@ class DotsGame extends FlameGame
           start.y + between * x,
         );
 
-        var color = colors[model.dots[x][y].color];
+        var dot = model.dots[x][y];
+        var color = colors[dot.color];
 
         add(DotComponent(
-          position: position,
-          color: color,
+          dot,
+          color,
+          position,
         )..anchor = Anchor.center);
 
         add(DotHighlightComponent(
@@ -74,6 +96,8 @@ class DotsGame extends FlameGame
         )..anchor = Anchor.center);
       }
     }
+
+    children.register<DotComponent>();
 
     return super.onLoad();
   }
