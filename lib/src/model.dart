@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:darq/darq.dart';
+
 class Model extends GetxController {
   int get size => dots.length;
   final List<List<Dot>> dots = [

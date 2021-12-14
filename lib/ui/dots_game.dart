@@ -31,30 +31,27 @@ class DotsGame extends FlameGame
 
   @override
   void onDragUpdate(int pointerId, DragUpdateInfo info) {
-    var points = path.points;
-
-    if (points.isNotEmpty) {
-      var dots = path.dots;
-      var offset = info.eventPosition.global;
-
-      for (var component in children.query<DotComponent>()) {
-        if (component.containsPoint(offset)) {
-          if (dots.first.color == component.color) {
+    var dots = path.dots;
+    for (var component in children.query<DotComponent>()) {
+      if (component.containsPoint(info.eventPosition.global)) {
+        if (dots.isEmpty) {
+          path.color = component.color;
+          path.dots.add(component);
+        } else if (dots.first.color == component.color) {
+          var next = component.dot;
+          if (dots.length > 1 && next == dots[dots.length - 2].dot) {
+            dots.removeLast();
+          } else {
             var last = dots.last.dot;
-            var item = component.dot;
-            if (last.x == item.x && (last.y - item.y).abs() == 1 ||
-                last.y == item.y && (last.x - item.x).abs() == 1) {
+            if (last.x == next.x && (last.y - next.y).abs() == 1 ||
+                last.y == next.y && (last.x - next.x).abs() == 1) {
               dots.add(component);
-              points.insert(
-                points.length - 1,
-                component.position.toOffset(),
-              );
             }
           }
         }
-      }
 
-      points.last = offset.toOffset();
+        break;
+      }
     }
 
     super.onDragUpdate(pointerId, info);
@@ -63,7 +60,6 @@ class DotsGame extends FlameGame
   @override
   void onDragEnd(int pointerId, DragEndInfo info) {
     path.dots.clear();
-    path.points.clear();
     super.onDragEnd(pointerId, info);
   }
 
