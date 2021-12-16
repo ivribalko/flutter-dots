@@ -3,30 +3,28 @@
 import 'dart:async';
 import 'package:flame/input.dart';
 import 'package:flutter_app/src/model.dart';
+import 'package:flutter_app/ui/config.dart';
 import 'package:get/get.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
-import 'package:flutter/material.dart';
 
 import 'component/dot.dart';
-import 'component/dot_highlight.dart';
 import 'path_painter.dart';
 
 class DotsGame extends FlameGame
     with HasCollidables, HasTappables, HasDraggables, MultiTouchDragDetector {
-  late PathPainter path;
+  final PathPainter path = Get.put(PathPainter());
   final Model model = Get.find();
-  final double between = 50;
   final List<DotComponent> dots = [];
-  final List<Color> colors = [
-    Colors.red,
-    Colors.green,
-    Colors.blue,
-    Colors.yellow,
-  ];
 
   DotsGame() {
     Get.put(this);
+
+    path.dots.stream.listen((selected) {
+      for (var dotComponent in children.query<DotComponent>()) {
+        dotComponent.highlighted.value = selected.contains(dotComponent);
+      }
+    });
   }
 
   @override
@@ -66,10 +64,10 @@ class DotsGame extends FlameGame
   @override
   Future<void> onLoad() async {
     add(CustomPainterComponent(
-      painter: path = Get.put(PathPainter()),
+      painter: path,
     )..anchor = Anchor.center);
 
-    final side = between * (model.size - 1);
+    final side = kBetween * (model.size - 1);
 
     final start = Vector2(
       size.x / 2 - side / 2,
@@ -79,22 +77,17 @@ class DotsGame extends FlameGame
     for (var x = 0; x < model.size; x++) {
       for (var y = 0; y < model.size; y++) {
         var position = Vector2(
-          start.x + between * y,
-          start.y + between * x,
+          start.x + kBetween * y,
+          start.y + kBetween * x,
         );
 
         var dot = model.dots[x][y];
-        var color = colors[dot.color];
+        var color = kColors[dot.color];
 
         add(DotComponent(
           dot,
           color,
           position,
-        )..anchor = Anchor.center);
-
-        add(DotHighlightComponent(
-          position: position,
-          color: color,
         )..anchor = Anchor.center);
       }
     }
