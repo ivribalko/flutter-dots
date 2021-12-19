@@ -18,9 +18,9 @@ class DotsGame extends FlameGame
   DotsGame() {
     Get.put(this);
 
-    path.dots.stream.listen((selected) {
-      for (var dotComponent in children.query<DotView>()) {
-        dotComponent.picked.value = selected.contains(dotComponent);
+    path.dots.stream.listen((picked) {
+      for (var dotView in children.query<DotView>()) {
+        dotView.picked.value = picked.contains(dotView);
       }
     });
   }
@@ -31,18 +31,14 @@ class DotsGame extends FlameGame
     for (var dotView in children.query<DotView>()) {
       if (dotView.containsPoint(info.eventPosition.global)) {
         if (dots.isEmpty) {
-          path.color = dotView.paint.color;
-          path.dots.add(dotView);
-        } else if (dots.first.paint.color == dotView.paint.color) {
+          path.color = kColors[dotView.data.color.value!];
+          dots.add(dotView);
+        } else if (dots.first.data.color.value == dotView.data.color.value) {
           var next = dotView.data;
           if (dots.length > 1 && next == dots[dots.length - 2].data) {
             dots.removeLast();
-          } else {
-            var last = dots.last.data;
-            if (last.x == next.x && (last.y - next.y).abs() == 1 ||
-                last.y == next.y && (last.x - next.x).abs() == 1) {
-              dots.add(dotView);
-            }
+          } else if (connectable(dots.last.data, next)) {
+            dots.add(dotView);
           }
         }
 
@@ -53,24 +49,30 @@ class DotsGame extends FlameGame
     super.onDragUpdate(pointerId, info);
   }
 
+  bool connectable(DotData last, DotData next) =>
+      last.x == next.x && (last.y - next.y).abs() == 1 ||
+      last.y == next.y && (last.x - next.x).abs() == 1;
+
   @override
   void onDragEnd(int pointerId, DragEndInfo info) {
-    if (path.dots.length > path.dots.toSet().length) {
-      var color = path.dots.first.data.color.value;
-      model.traverse((dot) {
-        if (dot.color.value == color) {
-          dot.color.value = null;
+    var dots = path.dots;
+    if (dots.length > 1) {
+      if (dots.length > dots.toSet().length) {
+        var color = dots.first.data.color.value;
+        model.traverse((data) {
+          if (data.color.value == color) {
+            data.color.value = null;
+          }
+        });
+      } else {
+        for (var dotView in dots) {
+          dotView.data.color.value = null;
         }
-      });
-    } else if (path.dots.length > 1) {
-      model.traverse((dot) {
-        if (path.dots.any((i) => i.data == dot)) {
-          dot.color.value = null;
-        }
-      });
+      }
     }
+
+    dots.clear();
     model.refresh();
-    path.dots.clear();
     super.onDragEnd(pointerId, info);
   }
 
@@ -80,22 +82,20 @@ class DotsGame extends FlameGame
       painter: path,
     )..anchor = Anchor.center);
 
-    final side = kBetween * (model.size - 1);
+    final side = kBetween * (model.side - 1);
 
     final start = Vector2(
       size.x / 2 - side / 2,
       size.y / 2 - side / 2,
     );
 
-    model.traverse(null, (dot, x, y) {
-      var position = Vector2(
-        start.x + kBetween * y,
-        start.y + kBetween * x,
-      );
-
+    model.traverse(null, (data, x, y) {
       add(DotView(
-        dot,
-        position,
+        data,
+        Vector2(
+          start.x + kBetween * y,
+          start.y + kBetween * x,
+        ),
       )..anchor = Anchor.center);
     });
 
