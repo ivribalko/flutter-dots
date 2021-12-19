@@ -2,11 +2,11 @@ import 'dart:ui';
 
 import 'package:flame/src/extensions/vector2.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/ui/component/dot.dart';
+import 'package:flutter_app/ui/component/dot_view.dart';
 import 'package:get/get.dart';
 
 class PathPainter extends CustomPainter {
-  RxList<DotComponent> dots = <DotComponent>[].obs;
+  RxList<DotView> dots = <DotView>[].obs;
   Color color = Colors.transparent;
   List<Offset> _points = [];
 

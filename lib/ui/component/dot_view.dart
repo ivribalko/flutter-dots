@@ -5,12 +5,12 @@ import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
-class DotComponent extends CircleComponent {
-  final Dot dot;
-  final RxBool highlighted = false.obs;
+class DotView extends CircleComponent {
+  final DotData data;
+  final RxBool picked = false.obs;
 
-  DotComponent(
-    this.dot,
+  DotView(
+    this.data,
     Vector2 position,
   ) : super(
           radius: kDotRadius,
@@ -20,21 +20,21 @@ class DotComponent extends CircleComponent {
 
   @override
   Future<void>? onLoad() {
-    var paintComponent = paint;
-    var paintHighlight = Paint();
+    var paintSelf = paint;
+    var paintPick = Paint();
 
     add(CircleComponent(
-      paint: paintHighlight,
+      paint: paintPick,
       position: Vector2.all(kDotRadius - kDotHighlightRadius),
       radius: kDotHighlightRadius,
     ));
 
     CombineLatestStream.list([
-      dot.color.stream.startWith(dot.color.value).distinct(),
-      highlighted.stream.startWith(highlighted.value).distinct(),
+      data.color.stream.startWith(data.color.value).distinct(),
+      picked.stream.startWith(picked.value).distinct(),
     ]).listen((l) => set(
-          paintComponent,
-          paintHighlight,
+          paintSelf,
+          paintPick,
           l[0] as int?,
           l[1] as bool,
         ));
@@ -43,14 +43,14 @@ class DotComponent extends CircleComponent {
   }
 
   void set(
-    Paint paintComponent,
-    Paint paintHighlight,
+    Paint paintSelf,
+    Paint paintPick,
     int? colorIndex,
     bool highlighted,
   ) {
     var color = colorIndex == null ? Colors.transparent : kColors[colorIndex];
 
-    paintComponent.color = color;
-    paintHighlight.color = color.withAlpha(highlighted ? 100 : 0);
+    paintSelf.color = color;
+    paintPick.color = color.withAlpha(highlighted ? 100 : 0);
   }
 }

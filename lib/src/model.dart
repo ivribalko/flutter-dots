@@ -6,16 +6,16 @@ import 'package:darq/darq.dart';
 
 class Model {
   int get size => 4;
-  final List<List<Dot>> dots = [
+  final List<List<DotData>> dots = [
     [0, 0, 2, 3],
     [0, 0, 2, 3],
     [0, 1, 2, 3],
     [0, 1, 2, 3],
-  ].select((e, y) => e.select((e, x) => Dot(e, x, y)).toList()).toList();
+  ].select((e, y) => e.select((e, x) => DotData(e, x, y)).toList()).toList();
 
   void traverse([
-    void Function(Dot)? action1,
-    void Function(Dot, int, int)? action2,
+    void Function(DotData)? action1,
+    void Function(DotData, int, int)? action2,
   ]) {
     for (var x = 0; x < size; x++) {
       for (var y = 0; y < size; y++) {
@@ -33,10 +33,10 @@ class Model {
   }
 }
 
-class Dot {
+class DotData {
   final int x;
   final int y;
   final RxnInt color;
 
-  Dot(int? color, this.x, this.y) : color = RxnInt(color);
+  DotData(int? color, this.x, this.y) : color = RxnInt(color);
 }
