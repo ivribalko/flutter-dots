@@ -1,5 +1,3 @@
-// ignore_for_file: unawaited_futures
-
 import 'dart:async';
 import 'package:flame/input.dart';
 import 'package:flutter_app/src/model.dart';
@@ -13,9 +11,9 @@ import 'path_painter.dart';
 
 class DotsGame extends FlameGame
     with HasCollidables, HasTappables, HasDraggables, MultiTouchDragDetector {
-  final PathPainter path = Get.put(PathPainter());
   final Model model = Get.find();
   final List<DotComponent> dots = [];
+  final PathPainter path = Get.put(PathPainter());
 
   DotsGame() {
     Get.put(this);
@@ -33,9 +31,9 @@ class DotsGame extends FlameGame
     for (var component in children.query<DotComponent>()) {
       if (component.containsPoint(info.eventPosition.global)) {
         if (dots.isEmpty) {
-          path.color = component.color;
+          path.color = component.paint.color;
           path.dots.add(component);
-        } else if (dots.first.color == component.color) {
+        } else if (dots.first.paint.color == component.paint.color) {
           var next = component.dot;
           if (dots.length > 1 && next == dots[dots.length - 2].dot) {
             dots.removeLast();
@@ -57,12 +55,27 @@ class DotsGame extends FlameGame
 
   @override
   void onDragEnd(int pointerId, DragEndInfo info) {
+    if (path.dots.length > path.dots.toSet().length) {
+      var color = path.dots.first.dot.color.value;
+      model.traverse((dot) {
+        if (dot.color.value == color) {
+          dot.color.value = null;
+        }
+      });
+    } else if (path.dots.length > 1) {
+      model.traverse((dot) {
+        if (path.dots.any((i) => i.dot == dot)) {
+          dot.color.value = null;
+        }
+      });
+    }
+    model.refresh();
     path.dots.clear();
     super.onDragEnd(pointerId, info);
   }
 
   @override
-  Future<void> onLoad() async {
+  Future<void>? onLoad() {
     add(CustomPainterComponent(
       painter: path,
     )..anchor = Anchor.center);
@@ -74,23 +87,17 @@ class DotsGame extends FlameGame
       size.y / 2 - side / 2,
     );
 
-    for (var x = 0; x < model.size; x++) {
-      for (var y = 0; y < model.size; y++) {
-        var position = Vector2(
-          start.x + kBetween * y,
-          start.y + kBetween * x,
-        );
+    model.traverse(null, (dot, x, y) {
+      var position = Vector2(
+        start.x + kBetween * y,
+        start.y + kBetween * x,
+      );
 
-        var dot = model.dots[x][y];
-        var color = kColors[dot.color];
-
-        add(DotComponent(
-          dot,
-          color,
-          position,
-        )..anchor = Anchor.center);
-      }
-    }
+      add(DotComponent(
+        dot,
+        position,
+      )..anchor = Anchor.center);
+    });
 
     children.register<DotComponent>();
 
