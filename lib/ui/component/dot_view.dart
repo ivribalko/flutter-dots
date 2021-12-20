@@ -1,11 +1,13 @@
+import 'package:flame/effects.dart';
 import 'package:flutter_app/src/model.dart';
+import 'package:flutter_app/ui/component/effect_queue.dart';
 import 'package:flutter_app/ui/config.dart';
 import 'package:get/get.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
-class DotView extends CircleComponent {
+class DotView extends CircleComponent with EffectQueue {
   final DotData data;
   final RxBool picked = false.obs;
 
@@ -20,7 +22,6 @@ class DotView extends CircleComponent {
 
   @override
   Future<void>? onLoad() {
-    var paintSelf = paint;
     var paintPick = Paint();
 
     add(CircleComponent(
@@ -29,28 +30,35 @@ class DotView extends CircleComponent {
       radius: kDotHighlightRadius,
     ));
 
-    CombineLatestStream.list([
-      data.color.stream.startWith(data.color.value).distinct(),
-      picked.stream.startWith(picked.value).distinct(),
-    ]).listen((l) => set(
-          paintSelf,
-          paintPick,
-          l[0] as int?,
-          l[1] as bool,
-        ));
+    data.color.stream.startWith(data.color.value).distinct().listen((i) {
+      append(
+        ScaleEffect.to(
+          Vector2.zero(),
+          CurvedEffectController(
+            kDuration,
+            Curves.elasticInOut,
+          )..advance(0.3),
+        ),
+      );
+
+      append(
+        ScaleEffect.to(
+          Vector2.all(1),
+          CurvedEffectController(
+            kDuration,
+            Curves.elasticInOut,
+          )..advance(0.3),
+        ),
+        onLoaded: () {
+          paint.color = i == null ? Colors.transparent : kColors[i];
+        },
+      );
+    });
+
+    picked.stream.startWith(picked.value).distinct().listen((picked) {
+      paintPick.color = paint.color.withAlpha(picked ? 100 : 0);
+    });
 
     return super.onLoad();
-  }
-
-  void set(
-    Paint paintSelf,
-    Paint paintPick,
-    int? colorIndex,
-    bool highlighted,
-  ) {
-    var color = colorIndex == null ? Colors.transparent : kColors[colorIndex];
-
-    paintSelf.color = color;
-    paintPick.color = color.withAlpha(highlighted ? 100 : 0);
   }
 }
