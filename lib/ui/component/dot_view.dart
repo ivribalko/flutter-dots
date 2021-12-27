@@ -1,7 +1,9 @@
 import 'package:flame/effects.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter_app/src/model.dart';
 import 'package:flutter_app/ui/component/effect_queue.dart';
 import 'package:flutter_app/ui/config.dart';
+import 'package:flutter_app/ui/single_audio.dart';
 import 'package:get/get.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +33,7 @@ class DotView extends CircleComponent with EffectQueue {
             Curves.elasticInOut,
           )..advance(0.3),
         ),
+        onLoaded: () => SingleAudio.play('show.mp3'),
       );
 
       append(
@@ -41,7 +44,10 @@ class DotView extends CircleComponent with EffectQueue {
             Curves.elasticInOut,
           )..advance(0.3),
         ),
-        onLoaded: () => paint.color = kColors[i],
+        onLoaded: () {
+          paint.color = kColors[i];
+          SingleAudio.play('show.mp3');
+        },
       );
     });
 
@@ -67,6 +73,7 @@ class _PickedView extends CircleComponent with HasPaint {
         );
 
   void set(bool picked) {
+    FlameAudio.play('pick.mp3');
     if (picked) {
       var dt =
           _existing?.isMounted ?? false ? _existing!.controller.progress : 0.0;
