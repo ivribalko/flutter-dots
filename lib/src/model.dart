@@ -3,14 +3,21 @@ import 'package:get/get.dart';
 import 'package:darq/darq.dart';
 
 class Model {
-  final int side = 4;
+  late int side;
   final int colors = 4;
   final List<List<DotData>> dots = [
-    [0, 0, 2, 3],
-    [0, 0, 2, 3],
-    [0, 1, 2, 3],
-    [0, 1, 2, 0],
+    [0, 0, 2, 3, 2, 2],
+    [0, 0, 2, 3, 2, 2],
+    [0, 1, 2, 3, 2, 2],
+    [0, 1, 2, 0, 3, 2],
+    [0, 1, 2, 0, 3, 2],
+    [0, 1, 2, 0, 3, 2],
   ].select((e, y) => e.select((e, x) => DotData(e, x, y)).toList()).toList();
+
+  Model() {
+    side = dots.length;
+    assert(dots.all((it) => it.length == side));
+  }
 
   void traverse([
     void Function(DotData)? action1,
