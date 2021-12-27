@@ -22,14 +22,6 @@ class DotView extends CircleComponent with EffectQueue {
 
   @override
   Future<void>? onLoad() {
-    var paintPick = Paint();
-
-    add(CircleComponent(
-      paint: paintPick,
-      position: Vector2.all(kDotRadius - kDotHighlightRadius),
-      radius: kDotHighlightRadius,
-    ));
-
     data.color.stream.startWith(data.color.value).listen((i) {
       append(
         ScaleEffect.to(
@@ -53,10 +45,43 @@ class DotView extends CircleComponent with EffectQueue {
       );
     });
 
-    picked.stream.startWith(picked.value).distinct().listen((picked) {
-      paintPick.color = paint.color.withAlpha(picked ? 100 : 0);
-    });
+    var pickedView = _PickedView(Vector2.all(kDotRadius - kDotHighlightRadius));
+
+    add(pickedView);
+
+    picked.stream.startWith(picked.value).distinct().listen(pickedView.set);
 
     return super.onLoad();
+  }
+}
+
+class _PickedView extends CircleComponent with HasPaint {
+  static OpacityEffect? _existing;
+
+  _PickedView(
+    Vector2 position,
+  ) : super(
+          radius: kDotHighlightRadius,
+          position: position,
+          paint: Paint(),
+        );
+
+  void set(bool picked) {
+    if (picked) {
+      var dt =
+          _existing?.isMounted ?? false ? _existing!.controller.progress : 0.0;
+      add(_existing = OpacityEffect.fadeOut(
+        InfiniteEffectController(
+          SequenceEffectController([
+            LinearEffectController(kDuration),
+            ReverseLinearEffectController(kDuration),
+          ]),
+        )..advance(dt),
+      ));
+    } else if (children.any((it) => it is OpacityEffect)) {
+      remove(children.firstWhere((it) => it is OpacityEffect));
+    }
+    paint.color =
+        findParent<DotView>()!.paint.color.withAlpha(picked ? 100 : 0);
   }
 }

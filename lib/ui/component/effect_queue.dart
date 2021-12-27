@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 
+// TODO SequenceEffectController?
 mixin EffectQueue on PositionComponent {
   final Queue<Effect> _queue = Queue<Effect>();
 
