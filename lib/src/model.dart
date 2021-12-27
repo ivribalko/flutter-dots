@@ -23,19 +23,22 @@ class Model {
       }
     }
   }
-
-  void refresh() {
-    var random = Random();
-    traverse((dot) {
-      dot.color.value ??= random.nextInt(colors);
-    });
-  }
 }
 
 class DotData {
   final int x;
   final int y;
-  final RxnInt color;
+  final RxInt color;
 
-  DotData(int? color, this.x, this.y) : color = RxnInt(color);
+  DotData(int color, this.x, this.y) : color = RxInt(color);
+
+  void recolor() {
+    var next = Random().nextInt(Get.find<Model>().colors);
+    if (color.value == next) {
+      color.trigger(next);
+    } else {
+      // won't trigger same
+      color.value = next;
+    }
+  }
 }

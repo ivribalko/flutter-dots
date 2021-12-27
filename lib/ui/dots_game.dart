@@ -31,7 +31,7 @@ class DotsGame extends FlameGame
     for (var dotView in children.query<DotView>()) {
       if (dotView.containsPoint(info.eventPosition.global)) {
         if (dots.isEmpty) {
-          path.color = kColors[dotView.data.color.value!];
+          path.color = kColors[dotView.data.color.value];
           dots.add(dotView);
         } else if (dots.first.data.color.value == dotView.data.color.value) {
           var next = dotView.data;
@@ -61,18 +61,17 @@ class DotsGame extends FlameGame
         var color = dots.first.data.color.value;
         model.traverse((data) {
           if (data.color.value == color) {
-            data.color.value = null;
+            data.recolor();
           }
         });
       } else {
         for (var dotView in dots) {
-          dotView.data.color.value = null;
+          dotView.data.recolor();
         }
       }
     }
 
     dots.clear();
-    model.refresh();
     super.onDragEnd(pointerId, info);
   }
 

@@ -30,7 +30,7 @@ class DotView extends CircleComponent with EffectQueue {
       radius: kDotHighlightRadius,
     ));
 
-    data.color.stream.startWith(data.color.value).distinct().listen((i) {
+    data.color.stream.startWith(data.color.value).listen((i) {
       append(
         ScaleEffect.to(
           Vector2.zero(),
@@ -49,9 +49,7 @@ class DotView extends CircleComponent with EffectQueue {
             Curves.elasticInOut,
           )..advance(0.3),
         ),
-        onLoaded: () {
-          paint.color = i == null ? Colors.transparent : kColors[i];
-        },
+        onLoaded: () => paint.color = kColors[i],
       );
     });
 
