@@ -61,7 +61,7 @@ class DotView extends CircleComponent with EffectQueue {
   }
 }
 
-class _PickedView extends CircleComponent with HasPaint {
+class _PickedView extends CircleComponent {
   static OpacityEffect? _existing;
 
   _PickedView(

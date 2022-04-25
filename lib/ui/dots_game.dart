@@ -10,7 +10,7 @@ import 'component/dot_view.dart';
 import 'path_painter.dart';
 
 class DotsGame extends FlameGame
-    with HasCollidables, HasTappables, HasDraggables, MultiTouchDragDetector {
+    with HasTappables, HasDraggables, MultiTouchDragDetector {
   final Model model = Get.find();
   final List<DotView> dots = [];
   final PathPainter path = Get.put(PathPainter());
