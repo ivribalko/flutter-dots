@@ -1,4 +1,4 @@
-package com.rybalko.flutter_app
+package com.example.flutter_dots
 
 import io.flutter.embedding.android.FlutterActivity
 
