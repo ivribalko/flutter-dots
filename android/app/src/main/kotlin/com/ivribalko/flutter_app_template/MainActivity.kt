@@ -1,4 +1,4 @@
-package com.example.flutter_dots
+package com.ivribalko.flutter_app_template
 
 import io.flutter.embedding.android.FlutterActivity
 
