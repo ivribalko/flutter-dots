@@ -1,4 +1,4 @@
-# flutter-dots
+# Flutter Dots
 
 A game of dots built with [Flame](https://docs.flame-engine.org/).
 
